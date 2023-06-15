@@ -30,7 +30,7 @@ async def get_similar_foods(Title: str):
 
 @food_Router.get("/reccomend/{Title}", tags=["reccomend food"])
 async def get_similar_foods(Title: str):
-    similar_foods = collection.find({"Title": Title})
+    regex = re.compile(f".*{Title}.*", re.IGNORECASE)
+    similar_foods = collection.find({"Title": regex})
     formatted_foods = [{"Title": food["Title"], "Ingredients": food["Ingredients"]} for food in similar_foods]
     return formatted_foods
-
