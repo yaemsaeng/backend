@@ -14,7 +14,27 @@ cred = credentials.Certificate("./firebase/food-5fd0f-firebase-adminsdk-j0le2-69
 firebase_admin.initialize_app(cred, {'storageBucket': 'food-5fd0f.appspot.com'})
 bucket = storage.bucket()
 
-@food_Router.get("/search/{Title}", tags=["reccomend food"])
+@food_Router.get("/all", tags=["reccomend food"])
+async def get_200_foods_recommend():
+    limit = 200
+    foods = foods_serializer(collection.find().limit(limit))
+    image_names = [food["Image_Name"] + ".jpg" for food in foods]
+
+    urls = []
+    for image_name in image_names:
+        blob = bucket.blob(image_name)
+        url = blob.generate_signed_url(
+            expiration=datetime.timedelta(days=7),
+        )
+        urls.append(url)
+
+    # เปลี่ยนค่า "Image_Name" ใน foods เป็นค่าจาก urls
+    for i, food in enumerate(foods):
+        food["Image_Name"] = urls[i]
+
+    return foods
+
+@food_Router.get("/search/{Title}", tags=["search food"])
 async def get_similar_foods(Title: str):
     regex = re.compile(f".*{Title}.*", re.IGNORECASE)
     similar_foods = foods_serializer(collection.find({"Title": regex}))
