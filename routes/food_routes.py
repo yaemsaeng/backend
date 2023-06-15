@@ -32,5 +32,5 @@ async def get_similar_foods(Title: str):
 async def get_similar_foods(Title: str):
     regex = re.compile(f".*{Title}.*", re.IGNORECASE)
     similar_foods = collection.find({"Title": regex})
-    formatted_foods = [{"Title": food["Title"], "Ingredients": food["Ingredients"]} for food in similar_foods]
+    formatted_foods = [{"Title": food["Title"], "Ingredients": food["Ingredients"],"Image_Name":food["Image_Name"]} for food in similar_foods]
     return formatted_foods
